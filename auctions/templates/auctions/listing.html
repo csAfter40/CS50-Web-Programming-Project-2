@@ -1,0 +1,91 @@
+{% extends "auctions/layout.html" %}
+{% block body %}
+    {% if listing %}
+        <div class="px-4 py-5 my-5 text-center">
+            <img class="d-block mx-auto mb-4" src="{{listing.image_url}}" alt="" style="max-width: 60%; height: auto;">
+            <h1 class="display-5 fw-bold">{{listing.title}}</h1>
+            <div class="col-lg-6 mx-auto">
+              <p class="lead mb-4">{{listing.description}}</p>
+              {% if request.user == listing.winner %}
+                <h2>You won this auction!</h2>
+              {% endif %}
+              <p>Submitted by: {{listing.user}}</p>
+              <p>Date created: {{listing.create_time}}</p>
+              <p>Starting Bid: {{listing.starting_bid}}</p>
+              {% if listing.status == 1 %}
+                <p><b> Current Bid: {{current_bid}}</b></p>
+                
+              <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                {% if request.user == listing.user %}
+                  <a href="{% url 'close' listing.id %}"><button type="button" class="btn btn-primary btn-lg px-4 gap-3">Close</button></a>
+                  <a href="{% url 'update' listing.id %}"><button type="button" class="btn btn-outline-secondary btn-lg px-4">Edit</button></a>
+                {% else %}
+                  {% if request.user.is_authenticated %}
+                  <form action="{% url 'detail' listing.id %}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                      <input class="form-control" type="number" min="{{current_bid}}" max="10000.00" step="0.01" name="bid" placeholder="Min. {{current_bid}}" required>
+                    </div>
+                    <div class="form-group">
+                      <input class="form-control" id="submit" type="submit" name="submit" value="Place Bid" >
+                    </div>
+                  </form>
+                  {% if is_in_watchlist %}
+                  <a href="/{{listing.id}}/watchlist"><button type="button" class="btn btn-sm btn-outline-primary">Remove <br> from <br> Watchlist</button></a>
+                  <!-- <a type="button" class="btn btn-sm btn-outline-primary" href="/{{listing.id}}/watchlist">Remove from Watchlist</a> -->
+                  {% else %}
+                  <a href="/{{listing.id}}/watchlist"><button type="button" class="btn btn-sm btn-outline-secondary">Add <br> to <br> Watchlist</button></a>
+                  <!-- <a type="button" class="btn btn-sm btn-outline-secondary" href="/{{listing.id}}/watchlist">Add to Watchlist</a> -->
+                  {% endif %}
+                  {% endif %}
+                  
+                {% endif %}
+              {% else %}
+                <p>This auction is closed.</p>
+                {% if listing.winner %}
+                  <p>Item sold for <b>{{listing.max_bid}}</b></p>
+                {% else %}
+                  <p>Item is not sold. Auction closed by owner.</p>
+                {% endif %}
+                
+              {% endif %}
+              
+                
+                
+                
+                
+              </div>
+            </div>
+          </div>
+    {% else %}
+        <p>Listing #{{id}} not available</p>
+    {% endif %} 
+    <div class="mb-3 col-sm-6 text-center" >
+      
+    </div>
+    <form method="POST" action="{% url 'comment' listing.id %}">
+      {% csrf_token %}
+      <div class="container bg-light col-sm-6">
+        <h2>Messages</h2>
+        <div class="mb-3 col-sm-12">
+          <label for="message-area" class="form-label">Write your message</label>
+          <textarea class="form-control" id="message-area" name="comment" rows="3"></textarea>
+        </div>
+        <div class="form-group col-sm-6">
+          <input class="form-control" id="submit" type="submit" name="submit" value="Send comment" >
+      </div>
+      </div>
+    </form>
+    {% for comment in comments %}
+    <div class="container bg-light col-sm-6">
+      <div class="container my-2 bg-light col-sm-12">
+        <p class="my-1"><b>{{ comment.user }}</b></p>
+        <p class="my-1 lead">{{ comment.text }}</p>
+        <p class="my-1">{{ comment.time }}</p><br>
+      </div>
+    </div>
+      
+    {% endfor %}
+    
+
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends  "auctions/layout.html" %}
+
+{% block body %}
+<div class="container col-sm-6 bg-light p-3">
+    <h2 class="mb-3">Create Listing</h2>
+    <form action="{% url 'create' %}" method="POST">
+        {% csrf_token %}
+        <div class="form-group my-2">
+            <input class="form-control" type="text" autofocus name="title" placeholder="Listing Title" maxlength="128" required>
+        </div>
+        <div class="form-group my-2">
+            <textarea class="form-control" name="description" maxlength="1024" placeholder="Description" id="description" cols="30" rows="5" required></textarea>
+        </div>
+        <div class="form-group my-2">
+            <input class="form-control" type="number" min="0.00" max="10000.00" step="0.01" name="bid" placeholder="Starting Bid" required>
+        </div>
+        <div class="form-group my-2">
+            <input class="form-control" type="url" name="picture" placeholder="Picture URL">
+        </div>
+        <div class="form-group my-2">
+            <!-- <input class="form-control" list="categories" name="category" id="category" placeholder="Select a Category"> -->
+            <select class="form-control" name="category">
+                <option value="" disabled selected>Select a category</option>
+                {% for category in category_names %}
+                    <option value="{{ category }}">{{ category }}</option>
+                {% endfor %}
+            </select>
+            <!-- <datalist id="categories">
+                {% for category in categories %}
+                    <option value="{{ category }}">
+                {% endfor %}
+            </datalist> -->
+        </div>
+        <div class="form-group my-2">
+            <input class="form-control" id="submit" type="submit" name="submit" value="Create" >
+        </div>
+        
+    </form>
+</div>
+
+{% endblock %}
